@@ -1,0 +1,34 @@
+dataset_config:
+  sensetimeVAD:
+    train_root:
+      - ""
+      - ""
+      - ""
+    train_source:
+      - /mnt/lustre/DATAshare/sense_action/raw_videos/changning_collect/changning_collect_fight_train_v1.2.txt
+      - /mnt/lustre/DATAshare/sense_action/raw_videos/changning_share/dataset_splits/subset/changning_share_train_v1.0.txt
+      - /mnt/lustre/DATAshare/sense_action/raw_videos/changning_collect_v2/dataset_splits_new_5/changning_collect_fighting_v2_beta_train.txt
+    val_root:
+      - ""
+    val_source:
+      - /mnt/lustre/share/suhaisheng/project/SenseCrime/SDK/Action_Patch_Tracklet/data/changning_collect_fight_test_v1.2.txt
+
+    num_segments: 8
+    new_length: 1
+    scan_interval: 10
+    bbox_expand_ratio: 1.5
+    filter_motor: False
+    use_mannequin: False
+    ignore_squat: True
+    merge_data: False
+
+    image_tmpl: 'image_{:05d}.jpg'
+
+
+    
+    
+
+
+
+
+
