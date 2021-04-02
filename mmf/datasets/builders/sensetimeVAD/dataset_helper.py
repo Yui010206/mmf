@@ -6,6 +6,7 @@ from collections import defaultdict
 from PIL import Image
 from utils.utils import extend_by_x
 import json
+import copy
 
 
 HUMAN_POWERED_TRANSPORT = 1507442
@@ -205,3 +206,46 @@ def cal_iou(roi_A, roi_B):
         intersect = max(
             0., (inter_bx - inter_tx)) * max(0., (inter_by - inter_ty))
         return float(intersect) / (s_A + s_B - intersect)
+
+def generate_adaptive_patch_roi(roi, ref_size, patch_expand_ratio):
+    # if bbox_expand_ratio != 1:
+    #     half_ratio = (bbox_expand_ratio - 1) / 2.0
+    #     x1, y1, x2, y2 = roi
+    #     w_roi = x2 - x1
+    #     h_roi = y2 - y1
+    #     x1_ = roi[0] + half_ratio * w_roi
+    #     y1_ = roi[1] + half_ratio * h_roi
+    #     x2_ = roi[2] - half_ratio * w_roi
+    #     y2_ = roi[3] - half_ratio * h_roi
+    #     roi = np.array([x1_, y1_, x2_, y2_])
+
+    copy_roi = copy.deepcopy(roi)
+    w_roi = roi[2] - roi[0]
+    h_roi = roi[3] - roi[1]
+    center_x = (roi[0] + roi[2]) // 2
+    center_y = (roi[1] + roi[3]) // 2
+
+    if patch_expand_ratio is not None and isinstance(patch_expand_ratio, list):
+        patch_expand_ratio = np.random.choice(patch_expand_ratio)
+
+    if patch_expand_ratio is None:
+        offset = 56
+    else:
+        half_ratio = (patch_expand_ratio - 1) / 2.0
+
+    if w_roi > h_roi:
+        if patch_expand_ratio is not None:
+            offset = w_roi * half_ratio
+        roi[0] = max(0, roi[0] - offset)
+        roi[2] = min(ref_size[0], roi[2] + offset)
+        roi[1] = max(0, center_y - int((w_roi + 2 * offset) / 2))
+        roi[3] = min(ref_size[1], center_y + int((w_roi + 2 * offset) / 2))
+    else:
+        if patch_expand_ratio is not None:
+            offset = h_roi * half_ratio
+        roi[0] = max(0, center_x - int((h_roi + 2 * offset) / 2))
+        roi[2] = min(ref_size[0], center_x + int((h_roi + 2 * offset) / 2))
+        roi[1] = max(0, roi[1] - offset)
+        roi[3] = min(ref_size[1], roi[3] + offset)
+
+    return roi, copy_roi

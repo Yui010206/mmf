@@ -23,6 +23,7 @@ dataset_config:
     merge_data: False
 
     image_tmpl: 'image_{:05d}.jpg'
+    patch_expand_ratio: 2
 
 
     
